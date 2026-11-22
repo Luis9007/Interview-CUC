@@ -1,0 +1,114 @@
+/* Custom styling for CUC Technical Interview Prep App */
+:root {
+  --cuc-red: #c41230;
+  --cuc-red-dark: #990000;
+  --cuc-red-light: #fef2f2;
+  --cuc-yellow: #f59e0b;
+  --cuc-yellow-light: #fffbeb;
+  --cuc-dark: #1e293b;
+  --cuc-gray: #64748b;
+}
+
+@keyframes pulse-subtle {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.85; transform: scale(1.02); }
+}
+
+.animate-pulse-subtle {
+  animation: pulse-subtle 3s infinite ease-in-out;
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Code editor styling */
+.code-editor {
+  font-family: 'Fira Code', 'Courier New', monospace;
+  tab-size: 2;
+  line-height: 1.6;
+}
+
+/* Tab indicator */
+.nav-tab.active {
+  border-bottom: 3px solid #fcd34d;
+  color: #fcd34d;
+  font-weight: 700;
+}
+
+/* Flip card effect for flashcards */
+.perspective-1000 {
+  perspective: 1000px;
+}
+.transform-style-3d {
+  transform-style: preserve-3d;
+}
+.backface-hidden {
+  backface-visibility: hidden;
+}
+.rotate-y-180 {
+  transform: rotateY(180deg);
+}
+
+/* Custom button states with high contrast */
+.quiz-option-btn {
+  color: #1e293b;
+  font-weight: 500;
+}
+.quiz-option-btn:hover {
+  background-color: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+/* Active buttons contrast */
+.main-mode-btn.active {
+  background-color: rgba(127, 29, 29, 0.7) !important;
+  color: #fde68a !important;
+  border-bottom: 2px solid #fde68a !important;
+}
+
+.practice-subtab-btn.active {
+  background-color: #b91c1c !important;
+  color: #ffffff !important;
+}
+.practice-subtab-btn:not(.active) {
+  background-color: #ffffff !important;
+  color: #334155 !important;
+  border: 1px solid #e2e8f0 !important;
+}
+.practice-subtab-btn:not(.active):hover {
+  background-color: #f1f5f9 !important;
+  color: #0f172a !important;
+}
+
+.flashcard-filter-btn.bg-red-700 {
+  background-color: #b91c1c !important;
+  color: #ffffff !important;
+}
+
+.flashcard-filter-btn.bg-slate-200 {
+  background-color: #e2e8f0 !important;
+  color: #334155 !important;
+}
+
+/* Print styles for export */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  .print-only {
+    display: block !important;
+  }
+}

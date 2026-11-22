@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-slate-100">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Preparador Prueba Técnica CUC | Practicante Desarrollo de Software</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            cuc: {
+              red: '#c41230',
+              redDark: '#990000',
+              redLight: '#fef2f2',
+              yellow: '#f59e0b',
+              yellowLight: '#fffbeb',
+              dark: '#0f172a'
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            mono: ['Fira Code', 'Courier New', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Google Fonts & Lucide Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="h-full flex flex-col text-slate-800 antialiased font-sans">
+
+  <!-- ==================== HEADER INSTITUCIONAL CUC ==================== -->
+  <header class="bg-gradient-to-r from-[#990000] via-[#c41230] to-[#b91c1c] text-white shadow-md sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        
+        <!-- Logo y Título -->
+        <div class="flex items-center gap-3">
+          <div class="bg-white text-cuc-red font-black px-2.5 py-1 rounded-md text-lg tracking-tighter shadow-sm flex items-center">
+            CUC
+          </div>
+          <div>
+            <h1 class="text-sm sm:text-base font-bold leading-tight flex items-center gap-2">
+              Universidad de la Costa
+              <span class="hidden sm:inline text-xs font-normal bg-red-800/80 px-2 py-0.5 rounded-full border border-red-400/30">
+                Prueba Técnica Presencial
+              </span>
+            </h1>
+            <p class="text-xs text-red-100 hidden sm:block">Practicante de Sistemas / Desarrollo de Software</p>
+          </div>
+        </div>
+
+        <!-- Temporizador y Progreso Rápido -->
+        <div class="flex items-center gap-3">
+          <!-- Temporizador integrado -->
+          <div class="bg-red-950/70 border border-red-400/30 px-3 py-1.5 rounded-lg flex items-center gap-2">
+            <i data-lucide="clock" class="w-4 h-4 text-amber-300"></i>
+            <span id="timer-display" class="font-mono font-bold text-sm text-amber-300">45:00</span>
+            <button id="timer-btn-start" class="text-xs bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold px-2 py-0.5 rounded transition">
+              Iniciar
+            </button>
+            <button id="timer-btn-reset" title="Reiniciar tiempo" class="text-xs text-red-200 hover:text-white transition">
+              <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+
+          <!-- Indicador de preparación -->
+          <div class="hidden md:flex flex-col items-end">
+            <span id="global-progress-text" class="text-xs font-bold text-white">0% Completado</span>
+            <div class="w-24 bg-red-950/70 h-1.5 rounded-full overflow-hidden mt-0.5">
+              <div id="global-progress-bar" class="bg-amber-400 h-full w-0 transition-all duration-300"></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- NAVEGACIÓN PRINCIPAL: DIVISIÓN EN TEORÍA Y PRÁCTICA -->
+      <nav class="flex space-x-2 sm:space-x-4 border-t border-red-700/60 pt-1 pb-1">
+        <button id="nav-btn-teoria" class="main-mode-btn active px-4 py-2 text-xs sm:text-sm font-bold rounded-t-lg transition flex items-center gap-2 bg-red-900/60 text-amber-300 border-b-2 border-amber-300">
+          <i data-lucide="book-open" class="w-4 h-4"></i>
+          <span>1. Sección Teórica (Estudio)</span>
+        </button>
+        <button id="nav-btn-practica" class="main-mode-btn px-4 py-2 text-xs sm:text-sm font-bold rounded-t-lg transition flex items-center gap-2 text-red-100 hover:text-white hover:bg-red-800/40">
+          <i data-lucide="code-2" class="w-4 h-4"></i>
+          <span>2. Sección Práctica (Retos)</span>
+        </button>
+        <button id="nav-btn-simulador" class="main-mode-btn px-3 py-2 text-xs sm:text-sm font-semibold rounded-t-lg transition flex items-center gap-1.5 text-red-100 hover:text-white hover:bg-red-800/40">
+          <i data-lucide="mic" class="w-4 h-4"></i>
+          <span class="hidden sm:inline">Simulador Oral</span>
+        </button>
+        <button id="nav-btn-flashcards" class="main-mode-btn px-3 py-2 text-xs sm:text-sm font-semibold rounded-t-lg transition flex items-center gap-1.5 text-red-100 hover:text-white hover:bg-red-800/40">
+          <i data-lucide="layers" class="w-4 h-4"></i>
+          <span>Flashcards</span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ==================== CONTENEDOR PRINCIPAL ==================== -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
+
+    <!-- ============================================================== -->
+    <!-- MODO 1: SECCIÓN TEÓRICA PARA ESTUDIAR (MANUAL COMPLETO)        -->
+    <!-- ============================================================== -->
+    <section id="view-teoria" class="main-view space-y-6">
+      
+      <!-- Banner Teórico -->
+      <div class="bg-gradient-to-r from-slate-900 via-slate-800 to-red-950 rounded-2xl p-6 text-white shadow-lg">
+        <div class="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <div class="inline-flex items-center gap-2 bg-red-600/30 border border-red-500/40 px-3 py-1 rounded-full text-xs font-semibold text-red-200 mb-2">
+              <i data-lucide="graduation-cap" class="w-3.5 h-3.5 text-amber-400"></i>
+              Manual de Estudio Técnico • Universidad de la Costa
+            </div>
+            <h2 class="text-2xl font-extrabold tracking-tight">Manual Completo de Fundamentos y Conceptos</h2>
+            <p class="text-slate-300 text-xs sm:text-sm max-w-3xl mt-1 leading-relaxed">
+              Estudia en profundidad cada tema antes de pasar al laboratorio de retos. 
+              Este temario abarca exactamente lo que el equipo evaluador de la CUC medirá en tu prueba presencial.
+            </p>
+          </div>
+          <button id="btn-ir-a-practicar" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-4 py-2 rounded-lg text-xs shadow transition flex items-center gap-2">
+            <i data-lucide="play" class="w-4 h-4"></i>
+            Ir al Laboratorio de Práctica
+          </button>
+        </div>
+      </div>
+
+      <!-- Menú de Módulos Teóricos y Contenido -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- Sidebar de Temas -->
+        <div class="lg:col-span-4 space-y-3">
+          <div class="bg-white border rounded-xl p-4 shadow-xs sticky top-24">
+            <h3 class="font-bold text-xs uppercase tracking-wider text-slate-500 mb-3 flex items-center gap-1.5">
+              <i data-lucide="list" class="w-4 h-4 text-red-600"></i>
+              Módulos de Estudio
+            </h3>
+            <div id="theory-modules-nav" class="space-y-2">
+              <!-- Botones inyectados dinámicamente -->
+            </div>
+
+            <!-- Caja de Consejos Presenciales -->
+            <div class="mt-6 p-4 bg-red-50/70 border border-red-200 rounded-xl text-xs text-red-950 space-y-2">
+              <span class="font-bold flex items-center gap-1.5 text-red-900">
+                <i data-lucide="lightbulb" class="w-4 h-4 text-amber-600"></i>
+                Claves durante la prueba:
+              </span>
+              <ul class="space-y-1.5 list-disc list-inside text-slate-700">
+                <li><strong>Piensa en voz alta:</strong> Explica tu lógica antes de escribir código.</li>
+                <li><strong>Pregunta antes de asumir:</strong> Valida casos borde con el jurado.</li>
+                <li><strong>Prioriza que funcione:</strong> Haz una solución correcta primero, luego optimiza.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Contenedor del Contenido Teórico -->
+        <div class="lg:col-span-8 space-y-4">
+          <div class="bg-white border rounded-2xl p-6 sm:p-8 shadow-xs">
+            <div id="theory-content-body" class="space-y-6">
+              <!-- Contenido renderizado dinámicamente -->
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- ============================================================== -->
+    <!-- MODO 2: SECCIÓN PRÁCTICA (LABORATORIO DE RETOS & SIMULADORES)  -->
+    <!-- ============================================================== -->
+    <section id="view-practica" class="main-view hidden space-y-6">
+      
+      <!-- Sub-navegación de categorías de práctica -->
+      <div class="bg-white border rounded-xl p-2 shadow-xs flex flex-wrap gap-2">
+        <button data-practice-sub="logica" class="practice-subtab-btn active px-3.5 py-2 rounded-lg text-xs font-bold bg-red-700 text-white transition flex items-center gap-1.5">
+          <i data-lucide="code" class="w-3.5 h-3.5"></i>
+          <span>1. Lógica y Algoritmos (Editor Libre)</span>
+        </button>
+        <button data-practice-sub="sql" class="practice-subtab-btn px-3.5 py-2 rounded-lg text-xs font-bold text-slate-700 hover:bg-slate-100 transition flex items-center gap-1.5">
+          <i data-lucide="database" class="w-3.5 h-3.5"></i>
+          <span>2. Consultas SQL (Tablero en Blanco)</span>
+        </button>
+        <button data-practice-sub="web" class="practice-subtab-btn px-3.5 py-2 rounded-lg text-xs font-bold text-slate-700 hover:bg-slate-100 transition flex items-center gap-1.5">
+          <i data-lucide="globe" class="w-3.5 h-3.5"></i>
+          <span>3. Casos Web y APIs</span>
+        </button>
+        <button data-practice-sub="git" class="practice-subtab-btn px-3.5 py-2 rounded-lg text-xs font-bold text-slate-700 hover:bg-slate-100 transition flex items-center gap-1.5">
+          <i data-lucide="git-branch" class="w-3.5 h-3.5"></i>
+          <span>4. Desafíos Git</span>
+        </button>
+        <button data-practice-sub="ia" class="practice-subtab-btn px-3.5 py-2 rounded-lg text-xs font-bold text-slate-700 hover:bg-slate-100 transition flex items-center gap-1.5">
+          <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+          <span>5. IA Aplicada & Prompts</span>
+        </button>
+      </div>
+
+      <!-- ==================== SUBSECCIÓN: LÓGICA Y ALGORITMOS ==================== -->
+      <div id="practice-panel-logica" class="practice-subpanel grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- Lista de Retos Algorítmicos -->
+        <div class="lg:col-span-4 space-y-4">
+          <div class="bg-white border rounded-xl p-4 shadow-xs">
+            <div class="flex items-center justify-between mb-2">
+              <h3 class="font-bold text-xs uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
+                <i data-lucide="list-checks" class="w-4 h-4 text-red-600"></i>
+                Retos de Lógica (25 Disponibles)
+              </h3>
+              <span id="practice-completed-count" class="text-xs font-semibold text-slate-500">0 resueltos</span>
+            </div>
+            <div id="coding-scoreboard" class="mb-3"></div>
+            <div id="practice-challenges-list" class="space-y-1.5 max-h-[550px] overflow-y-auto pr-1">
+              <!-- Inyectado dinámicamente -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Editor de Código en Blanco y Evaluador -->
+        <div class="lg:col-span-8 space-y-4">
+          <div class="bg-white border rounded-xl p-5 shadow-xs">
+            
+            <!-- Cabecera del Reto -->
+            <div class="flex flex-wrap items-center justify-between gap-2 border-b pb-4 mb-4">
+              <div>
+                <div class="flex items-center gap-2 mb-1">
+                  <span id="reto-categoria" class="text-xs font-bold text-red-600 uppercase tracking-wide">Categoría</span>
+                  <span id="reto-dificultad" class="text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">Dificultad</span>
+                </div>
+                <h2 id="reto-titulo" class="text-lg sm:text-xl font-bold text-slate-900">Título del Reto</h2>
+              </div>
+
+              <!-- Selector de Lenguaje -->
+              <div class="inline-flex rounded-lg border border-slate-200 p-0.5 bg-slate-100 text-xs">
+                <button id="reto-lang-js" class="px-3 py-1.5 rounded-md font-bold bg-red-700 text-white transition">
+                  JavaScript
+                </button>
+                <button id="reto-lang-py" class="px-3 py-1.5 rounded-md font-semibold text-slate-600 hover:text-slate-900 transition">
+                  Python
+                </button>
+              </div>
+            </div>
+
+            <!-- Descripción del Problema -->
+            <div class="mb-4">
+              <p id="reto-desc" class="text-sm text-slate-700 leading-relaxed mb-3">
+                Descripción...
+              </p>
+
+              <!-- Acordeón de Pistas -->
+              <details class="bg-slate-50 border border-slate-200 rounded-lg p-3 text-xs mb-3">
+                <summary class="font-bold text-slate-700 cursor-pointer flex items-center gap-1.5">
+                  <i data-lucide="help-circle" class="w-3.5 h-3.5 text-amber-500"></i>
+                  Ver Pistas de Ayuda (si estás atascado)
+                </summary>
+                <ul id="reto-pistas" class="mt-2 space-y-1 pl-2 text-slate-600"></ul>
+              </details>
+            </div>
+
+            <!-- Tablero / Editor en Blanco -->
+            <div class="border rounded-lg overflow-hidden mb-4 bg-slate-950 text-slate-100">
+              <div class="bg-slate-900 px-4 py-2 flex items-center justify-between border-b border-slate-800 text-xs font-mono">
+                <div class="flex items-center gap-2">
+                  <span class="w-3 h-3 rounded-full bg-red-500 inline-block"></span>
+                  <span class="w-3 h-3 rounded-full bg-amber-500 inline-block"></span>
+                  <span class="w-3 h-3 rounded-full bg-emerald-500 inline-block"></span>
+                  <span class="text-slate-400 ml-2">tu_solucion.<span id="file-ext-label">js</span> (tablero en blanco)</span>
+                </div>
+                <button id="btn-limpiar-tablero" title="Limpiar código" class="text-slate-400 hover:text-white flex items-center gap-1">
+                  <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> Limpiar Tablero
+                </button>
+              </div>
+              <textarea id="reto-editor-area" rows="12" placeholder="// Escribe aquí tu solución desde cero..." class="code-editor w-full p-4 bg-slate-950 text-emerald-400 text-sm focus:outline-none resize-y border-none font-mono"></textarea>
+            </div>
+
+            <!-- Botones de Acción -->
+            <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+              <button id="btn-probar-reto" class="bg-red-700 hover:bg-red-800 text-white font-bold px-5 py-2.5 rounded-lg text-xs sm:text-sm shadow transition flex items-center gap-2">
+                <i data-lucide="play" class="w-4 h-4"></i>
+                Probar y Calificar Solución
+              </button>
+
+              <button id="btn-revelar-solucion" class="text-xs font-semibold text-slate-600 hover:text-red-700 border border-slate-300 px-3.5 py-2 rounded-lg transition flex items-center gap-1.5">
+                <i data-lucide="eye" class="w-3.5 h-3.5"></i>
+                Ver Solución Explicada
+              </button>
+            </div>
+
+            <!-- Solución Explicada (Oculta por defecto) -->
+            <div id="reto-solucion-box" class="hidden mb-4 p-4 bg-slate-900 text-slate-200 rounded-lg border border-slate-800 text-xs font-mono overflow-x-auto">
+              <span class="text-amber-400 font-bold block mb-2 font-sans">// Solución Explicada y Comentada:</span>
+              <pre id="reto-solucion-code" class="whitespace-pre"></pre>
+            </div>
+
+            <!-- Diagnóstico y Corrección del Sistema -->
+            <div>
+              <h4 class="text-xs font-bold text-slate-700 uppercase tracking-wide mb-2 flex items-center gap-1.5">
+                <i data-lucide="activity" class="w-4 h-4 text-slate-500"></i>
+                Evaluación & Corrección Automática
+              </h4>
+              <div id="reto-feedback-area">
+                <div class="text-xs text-slate-500 italic p-3 bg-slate-50 rounded border border-slate-200">
+                  Escribe tu código en el tablero y haz clic en <strong>"Probar y Calificar Solución"</strong>. El evaluador ejecutará casos de prueba y te corregirá si hay algún error.
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ==================== SUBSECCIÓN: SQL ==================== -->
+      <div id="practice-panel-sql" class="practice-subpanel hidden space-y-6">
+        <div class="bg-white border rounded-xl p-6 shadow-xs">
+          <div class="border-b pb-4 mb-4">
+            <span class="text-xs font-bold text-red-600 uppercase tracking-wide">Laboratorio SQL</span>
+            <h3 class="text-lg font-bold text-slate-900">Escribe tus Propias Consultas SQL (Tablero en Blanco)</h3>
+            <p class="text-xs text-slate-500">Practica resolviendo los enunciados sin plantillas preescritas</p>
+          </div>
+
+          <!-- Selector de Reto SQL -->
+          <div class="mb-4">
+            <div class="flex items-center justify-between mb-2">
+              <label class="block text-xs font-bold text-slate-700">Selecciona un Ejercicio SQL (25 Disponibles):</label>
+            </div>
+            <div id="sql-scoreboard" class="mb-3"></div>
+            <div id="sql-challenge-buttons" class="flex flex-wrap gap-2 max-h-56 overflow-y-auto p-2 border rounded-lg bg-slate-50">
+              <!-- Botones inyectados -->
+            </div>
+          </div>
+
+          <!-- Enunciado Activo -->
+          <div class="p-4 bg-slate-50 border rounded-xl mb-4">
+            <h4 id="sql-reto-titulo" class="font-bold text-sm text-slate-900 mb-1">Enunciado</h4>
+            <p id="sql-reto-enunciado" class="text-xs text-slate-700 leading-relaxed"></p>
+          </div>
+
+          <!-- Editor SQL en Blanco -->
+          <div class="mb-4">
+            <div class="bg-slate-900 px-4 py-2 flex items-center justify-between rounded-t-lg text-xs font-mono text-slate-300">
+              <span>consulta_estudiante.sql (escribe tu SELECT aquí)</span>
+              <button id="btn-limpiar-sql" class="hover:text-white flex items-center gap-1">
+                <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Limpiar
+              </button>
+            </div>
+            <textarea id="sql-editor-area" rows="6" placeholder="SELECT ...&#10;FROM ...&#10;WHERE ...;" class="code-editor w-full p-4 bg-slate-950 text-amber-300 font-mono text-xs rounded-b-lg border border-slate-800 focus:outline-none"></textarea>
+          </div>
+
+          <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+            <button id="btn-ejecutar-sql" class="bg-red-700 hover:bg-red-800 text-white font-bold px-4 py-2 rounded-lg text-xs transition flex items-center gap-2">
+              <i data-lucide="play" class="w-4 h-4"></i>
+              Ejecutar y Validar Consulta
+            </button>
+            <button id="btn-ver-solucion-sql" class="text-xs font-semibold text-slate-600 hover:text-red-700 border border-slate-300 px-3 py-2 rounded-lg transition flex items-center gap-1.5">
+              <i data-lucide="eye" class="w-3.5 h-3.5"></i>
+              Ver Consulta Modelo
+            </button>
+          </div>
+
+          <div id="sql-solucion-box" class="hidden mb-4 p-4 bg-slate-900 text-slate-200 rounded-lg text-xs font-mono">
+            <span class="text-amber-400 font-bold block mb-1 font-sans">// Consulta SQL Recomendada:</span>
+            <pre id="sql-solucion-text" class="whitespace-pre"></pre>
+          </div>
+
+          <!-- Feedback y Tabla de Resultados -->
+          <div id="sql-feedback-container"></div>
+        </div>
+      </div>
+
+      <!-- ==================== SUBSECCIÓN: WEB, GIT, IA ==================== -->
+      <div id="practice-panel-web" class="practice-subpanel hidden space-y-4">
+        <div class="bg-white border rounded-xl p-6 shadow-xs">
+          <h3 class="text-lg font-bold text-slate-900 mb-1">Desafíos Prácticos: Protocolo HTTP y APIs REST (25 Casos)</h3>
+          <p class="text-xs text-slate-500 mb-4">Evalúa tu criterio en escenarios de la vida real con puntuación automática</p>
+          <div id="web-scoreboard"></div>
+          <div id="web-quiz-container" class="space-y-4"></div>
+        </div>
+      </div>
+
+      <div id="practice-panel-git" class="practice-subpanel hidden space-y-4">
+        <div class="bg-white border rounded-xl p-6 shadow-xs">
+          <h3 class="text-lg font-bold text-slate-900 mb-1">Desafíos de Terminal Git en Equipos (25 Casos)</h3>
+          <p class="text-xs text-slate-500 mb-4">Resuelve situaciones cotidianas de control de versiones con puntuación automática</p>
+          <div id="git-scoreboard"></div>
+          <div id="git-quiz-container" class="space-y-4"></div>
+        </div>
+      </div>
+
+      <div id="practice-panel-ia" class="practice-subpanel hidden space-y-4">
+        <div class="bg-white border rounded-xl p-6 shadow-xs">
+          <h3 class="text-lg font-bold text-slate-900 mb-1">Desafíos de Inteligencia Artificial Aplicada (25 Casos)</h3>
+          <p class="text-xs text-slate-500 mb-4">Criterio en temperatura, tokens, JSON estructurado y RAG con puntuación automática</p>
+          <div id="ia-scoreboard"></div>
+          <div id="ia-quiz-container" class="space-y-4"></div>
+        </div>
+      </div>
+
+    </section>
+
+
+    <!-- ============================================================== -->
+    <!-- MODO 3: SIMULADOR DE ENTREVISTA ORAL PRESENCIAL               -->
+    <!-- ============================================================== -->
+    <section id="view-simulador" class="main-view hidden space-y-6">
+      <div class="bg-gradient-to-r from-red-950 via-red-900 to-slate-900 rounded-2xl p-6 text-white shadow-lg">
+        <div class="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <div class="inline-flex items-center gap-2 bg-red-600/30 border border-red-400/30 px-3 py-1 rounded-full text-xs font-semibold text-red-200 mb-2">
+              <i data-lucide="mic" class="w-3.5 h-3.5 text-amber-300"></i>
+              Simulación de Interacción Frente a Evaluador
+            </div>
+            <h2 class="text-2xl font-extrabold">Simulador de Preguntas y Comunicación Técnica</h2>
+            <p class="text-red-200 text-xs sm:text-sm max-w-2xl mt-1">
+              Practica responder en voz alta. Lee la pregunta, piensa tu respuesta verbalmente, 
+              y luego revisa la rúbrica y la respuesta modelo sugerida.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white border rounded-2xl p-6 shadow-xs">
+        <h3 class="text-base font-bold text-slate-800 mb-3 flex items-center gap-2">
+          <i data-lucide="list-checks" class="w-5 h-5 text-red-600"></i>
+          Checklist Mental antes de Escribir Código en la Entrevista:
+        </h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+          <div class="p-3 bg-slate-50 border rounded-lg">
+            <span class="font-bold text-red-700 block mb-1">Paso 1: Clarificar</span>
+            <p class="text-slate-600">"¿Los datos de entrada pueden venir vacíos, con valores negativos o nulos?"</p>
+          </div>
+          <div class="p-3 bg-slate-50 border rounded-lg">
+            <span class="font-bold text-amber-700 block mb-1">Paso 2: Verbalizar</span>
+            <p class="text-slate-600">"Mi enfoque inicial será usar un bucle y un mapa de frecuencias para resolverlo en O(n)..."</p>
+          </div>
+          <div class="p-3 bg-slate-50 border rounded-lg">
+            <span class="font-bold text-emerald-700 block mb-1">Paso 3: Codificar Limpio</span>
+            <p class="text-slate-600">Escribe nombres legibles, divide en funciones y maneja el caso base primero.</p>
+          </div>
+          <div class="p-3 bg-slate-50 border rounded-lg">
+            <span class="font-bold text-blue-700 block mb-1">Paso 4: Prueba de Escritorio</span>
+            <p class="text-slate-600">Prueba manualmente con un ejemplo pequeño antes de decirle al evaluador 'ya terminé'.</p>
+          </div>
+        </div>
+      </div>
+
+      <div id="simulador-questions-list"></div>
+    </section>
+
+
+    <!-- ============================================================== -->
+    <!-- MODO 4: FLASHCARDS 3D                                          -->
+    <!-- ============================================================== -->
+    <section id="view-flashcards" class="main-view hidden space-y-6">
+      <div class="flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <span class="text-xs font-bold text-red-600 uppercase tracking-wide">Repaso Rápido & Memoria Activa</span>
+          <h2 class="text-xl font-bold text-slate-900">Flashcards de Conceptos Clave</h2>
+          <p class="text-xs text-slate-500">Haz clic sobre la tarjeta para voltearla y verificar tu respuesta</p>
+        </div>
+
+        <div class="flex flex-wrap gap-1.5 text-xs">
+          <button data-cat="Todas" class="flashcard-filter-btn px-3 py-1.5 rounded-lg font-semibold bg-red-700 text-white transition">Todas (30+)</button>
+          <button data-cat="Lógica" class="flashcard-filter-btn px-3 py-1.5 rounded-lg font-semibold bg-slate-200 text-slate-700 hover:bg-slate-300 transition">Lógica</button>
+          <button data-cat="POO" class="flashcard-filter-btn px-3 py-1.5 rounded-lg font-semibold bg-slate-200 text-slate-700 hover:bg-slate-300 transition">POO</button>
+          <button data-cat="SQL" class="flashcard-filter-btn px-3 py-1.5 rounded-lg font-semibold bg-slate-200 text-slate-700 hover:bg-slate-300 transition">SQL</button>
+          <button data-cat="Web" class="flashcard-filter-btn px-3 py-1.5 rounded-lg font-semibold bg-slate-200 text-slate-700 hover:bg-slate-300 transition">Web</button>
+          <button data-cat="Git" class="flashcard-filter-btn px-3 py-1.5 rounded-lg font-semibold bg-slate-200 text-slate-700 hover:bg-slate-300 transition">Git</button>
+          <button data-cat="IA" class="flashcard-filter-btn px-3 py-1.5 rounded-lg font-semibold bg-slate-200 text-slate-700 hover:bg-slate-300 transition">IA</button>
+          <button data-cat="Entrevista" class="flashcard-filter-btn px-3 py-1.5 rounded-lg font-semibold bg-slate-200 text-slate-700 hover:bg-slate-300 transition">Entrevista</button>
+        </div>
+      </div>
+
+      <!-- Tarjeta 3D -->
+      <div class="max-w-2xl mx-auto perspective-1000 my-8">
+        <div id="flashcard-container" class="cursor-pointer">
+          <div id="flashcard-inner" class="relative w-full h-80 rounded-2xl shadow-lg border border-slate-200 transform-style-3d transition-transform duration-500 bg-white">
+            
+            <!-- Frente -->
+            <div class="absolute inset-0 w-full h-full p-8 rounded-2xl flex flex-col justify-between backface-hidden bg-gradient-to-br from-white to-slate-50">
+              <div class="flex items-center justify-between">
+                <span id="flashcard-category" class="text-xs font-bold uppercase tracking-wider text-red-700 bg-red-50 px-2.5 py-1 rounded-md">
+                  Categoría
+                </span>
+                <span id="flashcard-counter" class="text-xs font-semibold text-slate-400">1 de 8</span>
+              </div>
+
+              <div class="text-center my-auto px-4">
+                <span class="text-xs font-semibold text-slate-400 block mb-2 uppercase tracking-wide">Pregunta de Examen</span>
+                <h3 id="flashcard-question" class="text-lg sm:text-xl font-bold text-slate-900 leading-snug">
+                  Cargando pregunta...
+                </h3>
+              </div>
+
+              <div class="text-center text-xs text-slate-400 flex items-center justify-center gap-1.5">
+                <i data-lucide="rotate-cw" class="w-3.5 h-3.5"></i>
+                Toca en cualquier parte para voltear y ver la respuesta
+              </div>
+            </div>
+
+            <!-- Reverso -->
+            <div class="absolute inset-0 w-full h-full p-8 rounded-2xl flex flex-col justify-between backface-hidden rotate-y-180 bg-gradient-to-br from-red-900 to-slate-900 text-white">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold uppercase tracking-wider text-amber-300 bg-red-950/60 px-2.5 py-1 rounded-md">
+                  Respuesta Explicada
+                </span>
+                <span class="text-xs text-red-200">Universidad de la Costa</span>
+              </div>
+
+              <div class="text-center my-auto px-4">
+                <p id="flashcard-answer" class="text-sm sm:text-base text-slate-100 leading-relaxed font-medium">
+                  Cargando respuesta...
+                </p>
+              </div>
+
+              <div class="text-center text-xs text-red-300 flex items-center justify-center gap-1.5">
+                <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+                Toca para volver a la pregunta
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="flex items-center justify-center gap-4 mt-6">
+          <button id="btn-prev-card" class="bg-white border hover:bg-slate-50 text-slate-700 font-bold px-5 py-2.5 rounded-xl shadow-xs text-sm transition flex items-center gap-2">
+            <i data-lucide="chevron-left" class="w-4 h-4"></i>
+            Anterior
+          </button>
+          <button id="btn-next-card" class="bg-red-700 hover:bg-red-800 text-white font-bold px-5 py-2.5 rounded-xl shadow-xs text-sm transition flex items-center gap-2">
+            Siguiente
+            <i data-lucide="chevron-right" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- PIE DE PÁGINA -->
+  <footer class="bg-slate-900 text-slate-400 text-xs py-6 border-t border-slate-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-2">
+        <span class="font-bold text-white">CUC Tech Prep</span>
+        <span>•</span>
+        <span>Universidad de la Costa</span>
+      </div>
+      <div>
+        <span>Preparación para prueba presencial de practicante en Sistemas / Software</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/data.js"></script>
+  <script src="js/data_theory.js"></script>
+  <script src="js/data_practice.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
